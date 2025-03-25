@@ -5,12 +5,11 @@ import path from 'path'
 import os from 'os'
 import { getText } from '@one-lang/get-selected-text'
 import { GlobalKeyboardListener } from 'node-global-key-listener'
-import dotenv from 'dotenv'
 import axios from 'axios'
 import image from '../../resources/images.png?asset'
-import * as config from '../../config'
 
-dotenv.config()
+const config = JSON.parse(fs.readFileSync('config.json', 'utf8'))
+ipcMain.handle('get-config', () => config);
 
 const globalKeyboardListener = new GlobalKeyboardListener()
 
@@ -88,7 +87,7 @@ const generateResume = async (jobDescription) => {
 
   try {
     const result = await axios.post(
-      'http://localhost:5000/api/resume/generate',
+      config.hostUrl + '/api/resume/generate',
       { jobDescription },
       {
         headers: {
@@ -104,7 +103,10 @@ const generateResume = async (jobDescription) => {
     const filename = match ? match[1] : `resume.docx`
 
     // Define path
-    const downloadsDir = path.join(os.homedir(), 'Downloads')
+    const downloadsDir = path.join(os.homedir(), "Downloads", "Resume");
+    if (!fs.existsSync(downloadsDir)) {
+      fs.mkdirSync(downloadsDir, { recursive: true });
+    }
     const savePath = path.join(downloadsDir, filename)
 
     // Write binary file to disk
