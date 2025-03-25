@@ -20,18 +20,21 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null)
   const navigate = useNavigate()
-  const [hostUrl, setHostUrl] = useState("")
+  const [hostUrl, setHostUrl] = useState('')
 
   useEffect(() => {
-    window.api.getConfig().then((config) => {
-      setHostUrl(config.hostUrl)
-    }).catch(err => {
-      console.error(err)
-    })
+    window.api
+      .getConfig()
+      .then((config) => {
+        setHostUrl(config.hostUrl)
+      })
+      .catch((err) => {
+        console.error(err)
+      })
   }, [])
 
   useEffect(() => {
-    if (!hostUrl) return;
+    if (!hostUrl) return
     const initializeUser = async () => {
       const token = localStorage.getItem('token')
       if (!token) {
@@ -39,10 +42,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return
       }
 
-
-
       try {
-        // const decoded: User = jwtDecode(token)
         api(hostUrl).defaults.headers.common['Authorization'] = `Bearer ${token}`
         const res = await api(hostUrl).get('/users/me')
         const userInfo = res.data
@@ -80,7 +80,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [hostUrl])
 
   const login = async (username: string, password: string) => {
-
     const res = await api(hostUrl).post('/users/login', { username, password })
     const token = res.data.token
     const decoded: User = jwtDecode(token)

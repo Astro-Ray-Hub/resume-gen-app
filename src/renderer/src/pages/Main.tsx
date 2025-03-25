@@ -23,11 +23,21 @@ function Main(): JSX.Element {
   const [generatedCount, setGeneratedCount] = useState(0)
 
   useEffect(() => {
-    window.electron.ipcRenderer.on('message', (event, arg) => {
-      if (arg.text.match(/^Generated :/g)) {
-        setGeneratedCount((prev) => prev + 1)
-      }
+    window.electron.ipcRenderer.on('generated', (event, arg) => {
+      setGeneratedCount((prev) => prev + 1)
 
+      setLogArray((prev) => [
+        ...prev,
+        {
+          text: arg.text,
+          type: arg.type,
+          id: arg.id,
+          ip: arg.ip
+        }
+      ])
+    })
+
+    window.electron.ipcRenderer.on('message', (event, arg) => {
       setLogArray((prev) => [
         ...prev,
         {
@@ -41,6 +51,7 @@ function Main(): JSX.Element {
 
     return () => {
       window.electron.ipcRenderer.removeAllListeners('message')
+      window.electron.ipcRenderer.removeAllListeners('generated')
     }
   }, [])
 

@@ -9,7 +9,7 @@ import axios from 'axios'
 import image from '../../resources/images.png?asset'
 
 const config = JSON.parse(fs.readFileSync('config.json', 'utf8'))
-ipcMain.handle('get-config', () => config);
+ipcMain.handle('get-config', () => config)
 
 const globalKeyboardListener = new GlobalKeyboardListener()
 
@@ -103,9 +103,9 @@ const generateResume = async (jobDescription) => {
     const filename = match ? match[1] : `resume.docx`
 
     // Define path
-    const downloadsDir = path.join(os.homedir(), "Downloads", "Resume");
+    const downloadsDir = path.join(os.homedir(), 'Downloads', 'Resume')
     if (!fs.existsSync(downloadsDir)) {
-      fs.mkdirSync(downloadsDir, { recursive: true });
+      fs.mkdirSync(downloadsDir, { recursive: true })
     }
     const savePath = path.join(downloadsDir, filename)
 
@@ -113,7 +113,7 @@ const generateResume = async (jobDescription) => {
     fs.writeFileSync(savePath, Buffer.from(result.data))
 
     // Notify frontend
-    mainWindow.webContents.send('message', {
+    mainWindow.webContents.send('generated', {
       text: `✅ Saved to ${savePath}`,
       type: 'success'
     })
