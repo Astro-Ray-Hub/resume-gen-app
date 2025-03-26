@@ -119,7 +119,6 @@ const generateResume = async (jobDescription) => {
     })
   } catch (error: any) {
     const { data } = error.response
-    console.log(error)
     mainWindow.webContents.send('message', {
       text: data.message || 'Failed to generate resume',
       type: 'error'
@@ -150,17 +149,7 @@ const setupGlobalKeyboardListener = () => {
           if (!jobDescription) {
             throw new Error('No text selected')
           }
-
           generateResume(jobDescription)
-        })
-        .catch((error) => {
-          const { data } = error.response
-          console.log(error)
-          mainWindow.webContents.send('message', {
-            text: data.message || 'Failed to generate resume',
-            type: 'error'
-          })
-          logMessage(error)
         })
     }
   })
