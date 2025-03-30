@@ -93,24 +93,20 @@ const generateResume = async (jobDescription) => {
         headers: {
           Authorization: `Bearer ${authToken}`
         },
-        responseType: 'arraybuffer'
       }
     )
 
-    // Extract filename from headers
-    const contentDisposition = result.headers['content-disposition']
-    const match = contentDisposition?.match(/filename="?([^"]+)"?/)
-    const filename = match ? match[1] : `resume.docx`
+    const { resumeBuffer, fileName, dirName } = result.data;
 
     // Define path
-    const downloadsDir = path.join(os.homedir(), 'Downloads', 'Resume')
+    const downloadsDir = path.join(os.homedir(), 'Downloads', 'Resume', `${dirName}`)
     if (!fs.existsSync(downloadsDir)) {
       fs.mkdirSync(downloadsDir, { recursive: true })
     }
-    const savePath = path.join(downloadsDir, filename)
+    const savePath = path.join(downloadsDir, `${fileName}.docx`)
 
     // Write binary file to disk
-    fs.writeFileSync(savePath, Buffer.from(result.data))
+    fs.writeFileSync(savePath, Buffer.from(resumeBuffer, 'base64'))
 
     // Notify frontend
     mainWindow.webContents.send('generated', {
